@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "github_nonpublic_api"
+version = "0.0.1"
+authors = [
+  { name="Bill Napier", email="napier@google.com" },
+]
+description = "This project is developing a python library that can be used to access 'NonPublic' parts of the GitHub API."
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/google/github_nonpublic_api"
+"Bug Tracker" = "https://github.com/google/github_nonpublic_api/issues"
