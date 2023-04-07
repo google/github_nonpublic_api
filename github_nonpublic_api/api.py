@@ -1,6 +1,5 @@
 from configobj import ConfigObj
 import html5lib
-import logging
 import os.path
 import pyotp
 import requests
