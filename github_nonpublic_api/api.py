@@ -52,10 +52,10 @@ class Api(object):
         self._session = _create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
 
+if __name__ == "__main__":
+    config = ConfigObj(os.path.expanduser('~/github.ini'), _inspec=True)
 
-config = ConfigObj(os.path.expanduser('~/github.ini'), _inspec=True)
-
-api = Api(config['username'], config['password'],
-          tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
-resp = api._session.get('https://github.com/billnapier/aoc2021/settings')
-resp.raise_for_status()
+    api = Api(config['username'], config['password'],
+            tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
+    resp = api._session.get('https://github.com/billnapier/aoc2021/settings')
+    resp.raise_for_status()
