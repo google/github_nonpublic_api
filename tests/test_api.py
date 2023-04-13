@@ -63,3 +63,17 @@ class TestApi(TestCase):
                 'organization[profile_name]': 'test',
                 'organization[company_name]': 'A Fake Business',
             })
+
+    def test_create_personal_org(self):
+        self._seed_session_with_file(NEW_ORG_FORM_HTML)
+        gh = api.Api(session=self.session)
+        gh.create_organization(org_name='test', contact_email='nobody@google.com',
+                                org_usage=api.OrganizationUsage.PERSONAL)
+        AssertThat(self.session.post).WasCalled().Once().With(
+            'https://github.com/account/organizations/new_org', data={
+                'authenticity_token': 'value',
+                'agreed_to_terms': 'yes',
+                'terms_of_service_type': 'standard',
+                'organization[billing_email]': 'nobody@google.com',
+                'organization[profile_name]': 'test',
+            })
