@@ -112,7 +112,6 @@ if __name__ == "__main__":
 
     api = Api(config['username'], config['password'],
               tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
-    api.create_organization(org_name='billnapier-test4',
-                            contact_email='napier@google.com',
-                            org_usage=OrganizationUsage.BUSINESS,
-                            business_name='Alphabet')
+    api.create_organization(org_name='blah',
+                            contact_email='example@example.com',
+                            org_usage=OrganizationUsage.PERSONAL)
