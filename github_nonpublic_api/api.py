@@ -48,7 +48,7 @@ def _get_and_submit_form(session, url: str, data_callback = None, form_id: str =
     return response
 
 
-def _create_login_session(username: str, password: str,
+def create_login_session(username: str, password: str,
                           tfa_callback, session: requests.Session = None) -> requests.Session:
     session = session or requests.Session()
 
@@ -84,7 +84,7 @@ class Api(object):
 
     def __init__(self, username: str = None, password: str = None, tfa_callback = None,
                     session: requests.Session = None):
-        self._session = session or _create_login_session(
+        self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
 
     def create_organization(self, org_name: str, contact_email: str,
