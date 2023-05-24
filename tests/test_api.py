@@ -61,6 +61,7 @@ class TestApi(TestCase):
                 'terms_of_service_type': 'corporate',
                 'organization[billing_email]': 'nobody@google.com',
                 'organization[profile_name]': 'test',
+                'organization[login]': 'test',
                 'organization[company_name]': 'A Fake Business',
             })
 
@@ -76,4 +77,5 @@ class TestApi(TestCase):
                 'terms_of_service_type': 'standard',
                 'organization[billing_email]': 'nobody@google.com',
                 'organization[profile_name]': 'test',
+                'organization[login]': 'test',
             })
