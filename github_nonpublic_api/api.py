@@ -96,6 +96,7 @@ class Api(object):
 
         def _create_org_callback(data):
             data['organization[profile_name]'] = org_name
+            data['organization[login]'] = org_name
             data['organization[billing_email]'] = contact_email
             data['terms_of_service_type'] = org_usage.value
             data['agreed_to_terms'] = 'yes'
