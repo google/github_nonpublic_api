@@ -8,10 +8,12 @@ import html5lib
 import pyotp
 import requests
 
+from absl import logging
 from configobj import ConfigObj
 
 
-def _get_and_submit_form(session, url: str, data_callback = None, form_id: str = None):
+def _get_and_submit_form(session, url: str, data_callback=None, form_id: str = None)):
+    logging.info('Fetching URL %s', url)
     response = session.get(url)
     response.raise_for_status()
 
@@ -43,6 +45,9 @@ def _get_and_submit_form(session, url: str, data_callback = None, form_id: str =
     if data_callback:
         data_callback(data)
 
+    logging.debug('Form data: %s', str(data))
+
+    logging.info('Posting from to  URL %s', url)
     response = session.post(urljoin(url, action_url), data=data)
     response.raise_for_status()
     return response
