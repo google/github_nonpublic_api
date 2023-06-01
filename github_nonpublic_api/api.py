@@ -11,7 +11,7 @@ import requests
 from configobj import ConfigObj
 
 
-def _get_and_submit_form(session, url: str, data_callback = None, form_matcher = lambda form: True):
+def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lambda form: True):
     print(url)
     response = session.get(url)
     response.raise_for_status()
@@ -49,7 +49,7 @@ def _get_and_submit_form(session, url: str, data_callback = None, form_matcher =
 
 
 def create_login_session(username: str, password: str,
-                          tfa_callback, session: requests.Session = None) -> requests.Session:
+                         tfa_callback, session: requests.Session = None) -> requests.Session:
     session = session or requests.Session()
 
     def _login_callback(data):
@@ -83,8 +83,8 @@ class Api(object):
     to pretend to be a real user.
     """
 
-    def __init__(self, username: str = None, password: str = None, tfa_callback = None,
-                    session: requests.Session = None):
+    def __init__(self, username: str = None, password: str = None, tfa_callback=None,
+                 session: requests.Session = None):
         self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
 
@@ -105,15 +105,16 @@ class Api(object):
                 data['organization[company_name]'] = business_name
 
         _get_and_submit_form(session=self._session,
-                                url=_CREATE_ORG_URL, data_callback=_create_org_callback,
-                                form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
+                             url=_CREATE_ORG_URL, data_callback=_create_org_callback,
+                             form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
 
     def install_application_in_organization(self, app_name: str, org_id: int):
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
         _get_and_submit_form(session=self._session,
-                                url=url, form_matcher=lambda form: app_name in form.attrib.get('action'))
+                             url=url,
+                             form_matcher=lambda form: app_name in form.attrib.get('action'))
 
 
 if __name__ == "__main__":
@@ -121,4 +122,5 @@ if __name__ == "__main__":
 
     api = Api(config['username'], config['password'],
               tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
-    api.install_application_in_organization(app_name='google-ospo-administrator', org_id=134553040)
+    api.install_application_in_organization(
+        app_name='google-ospo-administrator', org_id=134553040)
