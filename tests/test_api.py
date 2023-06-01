@@ -38,7 +38,8 @@ class TestApi(TestCase):
         self._seed_session_with_file(GITHUB_FORM_HTML)
 
         api._get_and_submit_form(
-            session=self.session, url='http://github.com', form_id='form2')
+            session=self.session, url='http://github.com',
+            form_matcher=lambda form: form.attrib.get('id') == 'form2')
 
         AssertThat(self.session.post).WasCalled().Once().With(
             'http://github.com/form2', data=dict(key='value2'))
@@ -48,14 +49,15 @@ class TestApi(TestCase):
 
         with AssertThat(ValueError).IsRaised():
             api._get_and_submit_form(
-                session=self.session, url='http://github.com', form_id='no_form')
+                session=self.session, url='http://github.com', 
+                form_matcher=lambda form: False)
 
     def test_create_business_org(self):
         self._seed_session_with_file(NEW_ORG_FORM_HTML)
         gh = api.Api(session=self.session)
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
-                                org_usage=api.OrganizationUsage.BUSINESS, 
-                                business_name='A Fake Business')
+                               org_usage=api.OrganizationUsage.BUSINESS,
+                               business_name='A Fake Business')
         AssertThat(self.session.post).WasCalled().Once().With(
             'https://github.com/account/organizations/new_org', data={
                 'authenticity_token': 'value',
@@ -71,7 +73,7 @@ class TestApi(TestCase):
         self._seed_session_with_file(NEW_ORG_FORM_HTML)
         gh = api.Api(session=self.session)
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
-                                org_usage=api.OrganizationUsage.PERSONAL)
+                               org_usage=api.OrganizationUsage.PERSONAL)
         AssertThat(self.session.post).WasCalled().Once().With(
             'https://github.com/account/organizations/new_org', data={
                 'authenticity_token': 'value',
@@ -81,7 +83,7 @@ class TestApi(TestCase):
                 'organization[profile_name]': 'test',
                 'organization[login]': 'test',
             })
-        
+
     def test_install_app_on_org(self):
         self._seed_session_with_file(ADD_APP_FORM_HTML)
         gh = api.Api(session=self.session)
