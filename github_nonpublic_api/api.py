@@ -122,5 +122,3 @@ if __name__ == "__main__":
 
     api = Api(config['username'], config['password'],
               tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
-    api.install_application_in_organization(
-        app_name='google-ospo-administrator', org_id=134553040)
