@@ -43,6 +43,8 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     if data_callback:
         data_callback(data)
 
+    print(data)
+
     response = session.post(urljoin(url, action_url), data=data)
     response.raise_for_status()
     return response
@@ -67,7 +69,7 @@ def create_login_session(username: str, password: str,
 
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
-
+_APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
 
 class OrganizationUsage(Enum):
     """Organization Usage for Organization Creation."""
@@ -115,6 +117,14 @@ class Api(object):
         _get_and_submit_form(session=self._session,
                              url=url,
                              form_matcher=lambda form: app_name in form.attrib.get('action'))
+
+    def toggle_app_suspended(self, org_name: str, app_install_id: int):
+        """Set this applicaiton install to be suspended or not."""
+        url = _APP_SUSPEND_URL.format(org_name=org_name, app_install_id=app_install_id)
+
+        _get_and_submit_form(session=self._session,
+                             url=url,
+                             form_matcher=lambda form: 'suspended' in form.attrib.get('action'))
 
 
 if __name__ == "__main__":
