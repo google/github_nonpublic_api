@@ -10,6 +10,8 @@ from github_nonpublic_api import api
 GITHUB_FORM_HTML = os.path.join(os.path.dirname(__file__), 'github_form.html')
 NEW_ORG_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'new_org_form.html')
+ADD_APP_FORM_HTML = os.path.join(
+    os.path.dirname(__file__), 'add_app_form.html')
 
 
 class TestApi(TestCase):
@@ -78,4 +80,13 @@ class TestApi(TestCase):
                 'organization[billing_email]': 'nobody@google.com',
                 'organization[profile_name]': 'test',
                 'organization[login]': 'test',
+            })
+        
+    def test_install_app_on_org(self):
+        self._seed_session_with_file(ADD_APP_FORM_HTML)
+        gh = api.Api(session=self.session)
+        gh.install_application_in_organization(app_name='test-app', org_id=42)
+        AssertThat(self.session.post).WasCalled().Once().With(
+            'https://github.com/apps/test-app/installations', data={
+                'authenticity_token': 'value',
             })
