@@ -12,7 +12,6 @@ from configobj import ConfigObj
 
 
 def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lambda form: True):
-    print(url)
     response = session.get(url)
     response.raise_for_status()
 
@@ -26,8 +25,6 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
             break
     if submit_form is None:
         raise ValueError('Unable to find form')
-
-    print(submit_form)
 
     action_url = submit_form.attrib['action']
     # Look at all the inputs under the given form.
