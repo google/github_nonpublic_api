@@ -8,11 +8,12 @@ import html5lib
 import pyotp
 import requests
 
+from absl import logging
 from configobj import ConfigObj
 
 
 def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lambda form: True):
-    print(url)
+    logging.info('Fetching URL %s', url)
     response = session.get(url)
     response.raise_for_status()
 
@@ -26,8 +27,6 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
             break
     if submit_form is None:
         raise ValueError('Unable to find form')
-
-    print(submit_form)
 
     action_url = submit_form.attrib['action']
     # Look at all the inputs under the given form.
@@ -43,7 +42,9 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     if data_callback:
         data_callback(data)
 
-    print(data)
+    logging.debug('Form data: %s', str(data))
+
+    logging.info('Posting from to  URL %s', url)
 
     response = session.post(urljoin(url, action_url), data=data)
     response.raise_for_status()
@@ -70,6 +71,7 @@ def create_login_session(username: str, password: str,
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
+
 
 class OrganizationUsage(Enum):
     """Organization Usage for Organization Creation."""
