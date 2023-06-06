@@ -12,7 +12,7 @@ from absl import logging
 from configobj import ConfigObj
 
 
-def _get_and_submit_form(session, url: str, data_callback=None, form_id: str = None):
+def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lambda form: True):
     logging.info('Fetching URL %s', url)
     response = session.get(url)
     response.raise_for_status()
@@ -20,16 +20,13 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_id: str = N
     doc = html5lib.parse(response.text, namespaceHTMLElements=False)
     forms = doc.findall('.//form')
 
-    # If no form_id is specified, just use the first (and probably only)
-    # form.  Otherwise find the named form to submit to.
-    submit_form = forms[0]
-    if form_id:
-        for form in forms:
-            if form.attrib.get('id') == form_id:
-                submit_form = form
-                break
-        else:
-            raise ValueError('%s form not found' % form_id)
+    submit_form = None
+    for form in forms:
+        if form_matcher(form):
+            submit_form = form
+            break
+    if submit_form is None:
+        raise ValueError('Unable to find form')
 
     action_url = submit_form.attrib['action']
     # Look at all the inputs under the given form.
@@ -54,7 +51,7 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_id: str = N
 
 
 def create_login_session(username: str, password: str,
-                          tfa_callback, session: requests.Session = None) -> requests.Session:
+                         tfa_callback, session: requests.Session = None) -> requests.Session:
     session = session or requests.Session()
 
     def _login_callback(data):
@@ -71,6 +68,7 @@ def create_login_session(username: str, password: str,
 
 
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
+_INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 
 
 class OrganizationUsage(Enum):
@@ -87,8 +85,8 @@ class Api(object):
     to pretend to be a real user.
     """
 
-    def __init__(self, username: str = None, password: str = None, tfa_callback = None,
-                    session: requests.Session = None):
+    def __init__(self, username: str = None, password: str = None, tfa_callback=None,
+                 session: requests.Session = None):
         self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
 
@@ -109,8 +107,16 @@ class Api(object):
                 data['organization[company_name]'] = business_name
 
         _get_and_submit_form(session=self._session,
-                                url=_CREATE_ORG_URL, data_callback=_create_org_callback,
-                                form_id='org-new-form')
+                             url=_CREATE_ORG_URL, data_callback=_create_org_callback,
+                             form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
+
+    def install_application_in_organization(self, app_name: str, org_id: int):
+        """Installs the specified app on the given organization."""
+        url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
+
+        _get_and_submit_form(session=self._session,
+                             url=url,
+                             form_matcher=lambda form: app_name in form.attrib.get('action'))
 
 
 if __name__ == "__main__":
@@ -118,6 +124,3 @@ if __name__ == "__main__":
 
     api = Api(config['username'], config['password'],
               tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
-    api.create_organization(org_name='blah',
-                            contact_email='example@example.com',
-                            org_usage=OrganizationUsage.PERSONAL)
