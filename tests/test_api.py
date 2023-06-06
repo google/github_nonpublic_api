@@ -12,6 +12,8 @@ NEW_ORG_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'new_org_form.html')
 ADD_APP_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'add_app_form.html')
+SUSPEND_APP_FORM = os.path.join(
+    os.path.dirname(__file__), 'suspend_app_form.html')
 
 
 class TestApi(TestCase):
@@ -90,5 +92,14 @@ class TestApi(TestCase):
         gh.install_application_in_organization(app_name='test-app', org_id=42)
         AssertThat(self.session.post).WasCalled().Once().With(
             'https://github.com/apps/test-app/installations', data={
+                'authenticity_token': 'value',
+            })
+
+    def test_suspend_app_toggle(self):
+        self._seed_session_with_file(SUSPEND_APP_FORM)
+        gh = api.Api(session=self.session)
+        gh.toggle_app_suspended(org_name='test-org', app_install_id=42)
+        AssertThat(self.session.post).WasCalled().Once().With(
+            'https://github.com/long/url/suspended', data={
                 'authenticity_token': 'value',
             })
