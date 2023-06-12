@@ -2,7 +2,7 @@ absl-py==1.4.0
 configobj==5.0.8
 html5lib==1.1
 pyotp==2.8.0
-pytest==7.3.1
+pytest==7.3.2
 pytruth==1.1.0
 requests==2.31.0
 ruff==0.0.272
