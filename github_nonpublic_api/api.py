@@ -91,6 +91,20 @@ class Api(object):
                  session: requests.Session = None):
         self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
+        
+        
+    def request_usage(self, days: int = 30):
+        """Requests a GitHub usage report.
+
+        Github will send an email link when the report is available.
+        """
+
+        def _request_usage_callback(data):
+            data['days'] = days
+        
+        _get_and_submit_form(session=self._session,
+                             url=_REQUEST_USAGE_URL, data_callback=_request_usage_callback,
+                             form_matcher=lambda form: form.attrib.get('action') == '/enterprises/alphabet/settings/metered_exports')
 
     def create_organization(self, org_name: str, contact_email: str,
                             org_usage: OrganizationUsage, business_name: str = None):

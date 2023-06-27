@@ -1,0 +1,48 @@
+<html>
+    <body>
+      <form data-turbo="false" action="/enterprises/alphabet/settings/metered_exports" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="value" />
+        <div class="mx-4 mt-3 mb-4">
+          <p>
+            A full detailed report will be generated including usage for all eligible <strong>GitHub</strong> products.
+          </p>
+          <p>
+            You’ll receive an email at <strong >github-admin@google.com</strong> as soon as it’s ready (it may take up to a couple of hours).
+          </p>
+        </div>
+    
+          <hr>
+          <div class="form-group px-4">
+            <label for="days_7">
+              <input type="radio" name="days" id="days_7" value="7" class="mr-1" checked="checked" />
+              Last 7 days
+              <span class="f6 color-fg-muted text-normal">(06/20/23 - 06/27/23)</span>
+    </label>      </div>
+          <hr>
+          <div class="form-group px-4">
+            <label for="days_30">
+              <input type="radio" name="days" id="days_30" value="30" class="mr-1" />
+              Last 30 days
+              <span class="f6 color-fg-muted text-normal">(05/28/23 - 06/27/23)</span>
+    </label>      </div>
+          <hr>
+          <div class="form-group px-4">
+            <label for="days_90">
+              <input type="radio" name="days" id="days_90" value="90" class="mr-1" />
+              Last 90 days
+              <span class="f6 color-fg-muted text-normal">(03/29/23 - 06/27/23)</span>
+    </label>      </div>
+          <hr>
+          <div class="form-group px-4">
+            <label for="days_180">
+              <input type="radio" name="days" id="days_180" value="180" class="mr-1" />
+              Last 180 days
+              <span class="f6 color-fg-muted text-normal">(12/29/22 - 06/27/23)</span>
+    </label>      </div>
+        <hr>
+    
+        <div class="mx-4 mt-4">
+          <button name="button" type="submit" class="btn btn-block btn-primary mb-3">Send report to email</button>
+        </div>
+    </form>
+    </body>
+</html>
