@@ -104,8 +104,10 @@ class Api(object):
             data['days'] = days
         
         _get_and_submit_form(session=self._session,
-                             url=_REQUEST_USAGE_URL, data_callback=_request_usage_callback,
-                             form_matcher=lambda form: form.attrib.get('action') == '/enterprises/alphabet/settings/metered_exports')
+                             url=_REQUEST_USAGE_URL, 
+                             data_callback=_request_usage_callback,
+                             form_matcher=lambda form: form.attrib.get('action') == 
+                                '/enterprises/alphabet/settings/metered_exports')
 
     def create_organization(self, org_name: str, contact_email: str,
                             org_usage: OrganizationUsage, business_name: str = None):
