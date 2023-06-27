@@ -14,6 +14,8 @@ ADD_APP_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'add_app_form.html')
 SUSPEND_APP_FORM = os.path.join(
     os.path.dirname(__file__), 'suspend_app_form.html')
+REQUEST_REPORT_FORM_HTML = os.path.join(
+    os.path.dirname(__file__), 'request_report_form.html')
 
 
 class TestApi(TestCase):
@@ -84,6 +86,16 @@ class TestApi(TestCase):
                 'organization[billing_email]': 'nobody@google.com',
                 'organization[profile_name]': 'test',
                 'organization[login]': 'test',
+            })
+        
+    def test_request_usage_report(self):
+        self._seed_session_with_file(REQUEST_REPORT_FORM_HTML)
+        gh = api.Api(session=self.session)
+        gh.request_usage(days=7)
+        AssertThat(self.session.post).WasCalled().Once().With(
+            '/enterprises/alphabet/settings/metered_exports', data={
+                'authenticity_token': 'value',
+                'days': 7,
             })
 
     def test_install_app_on_org(self):
