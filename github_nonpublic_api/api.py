@@ -71,6 +71,7 @@ def create_login_session(username: str, password: str,
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
+_REQUEST_USAGE_URL= 'https://github.com/enterprises/alphabet/settings/billing'
 
 
 class OrganizationUsage(Enum):
