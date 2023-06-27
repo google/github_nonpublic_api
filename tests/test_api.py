@@ -93,7 +93,7 @@ class TestApi(TestCase):
         gh = api.Api(session=self.session)
         gh.request_usage(days=7)
         AssertThat(self.session.post).WasCalled().Once().With(
-            '/enterprises/alphabet/settings/metered_exports', data={
+            'https://github.com/enterprises/alphabet/settings/metered_exports', data={
                 'authenticity_token': 'value',
                 'days': 7,
             })
