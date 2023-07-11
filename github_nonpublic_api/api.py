@@ -133,8 +133,12 @@ class Api(object):
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
+        def _install_app_callback(data):
+            data['install_target'] = 'all'
+
         _get_and_submit_form(session=self._session,
                              url=url,
+                             data_callback=_install_app_callback,
                              form_matcher=lambda form: app_name in form.attrib.get('action'))
 
     def toggle_app_suspended(self, org_name: str, app_install_id: int):
