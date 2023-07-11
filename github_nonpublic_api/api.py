@@ -1,13 +1,12 @@
 """An API to do things that aren't in the official public GitHub REST API."""
 
-from urllib.parse import urljoin
-from enum import Enum
-
 import os.path
+from enum import Enum
+from urllib.parse import urljoin
+
 import html5lib
 import pyotp
 import requests
-
 from absl import logging
 from configobj import ConfigObj
 
@@ -44,15 +43,17 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
 
     logging.debug('Form data: %s', str(data))
 
-    logging.info('Posting from to  URL %s', url)
+    submit_url = urljoin(url, action_url)
+    logging.info('Posting form to URL %s', submit_url)
 
-    response = session.post(urljoin(url, action_url), data=data)
+    response = session.post(submit_url, data=data)
     response.raise_for_status()
     return response
 
 
 def create_login_session(username: str, password: str,
                          tfa_callback, session: requests.Session = None) -> requests.Session:
+    """Create a requests.Session object with logged in GitHub cookies for the user."""
     session = session or requests.Session()
 
     def _login_callback(data):
@@ -71,7 +72,7 @@ def create_login_session(username: str, password: str,
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
-_REQUEST_USAGE_URL= 'https://github.com/enterprises/alphabet/settings/billing'
+_REQUEST_USAGE_URL = 'https://github.com/enterprises/alphabet/settings/billing'
 
 
 class OrganizationUsage(Enum):
@@ -92,9 +93,8 @@ class Api(object):
                  session: requests.Session = None):
         self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
-        
-        
-    def request_usage(self, days: int = 30):
+
+    def request_usage(self, days: int = 30) -> requests.Response:
         """Requests a GitHub usage report.
 
         Github will send an email link when the report is available.
@@ -102,15 +102,15 @@ class Api(object):
 
         def _request_usage_callback(data):
             data['days'] = days
-        
-        _get_and_submit_form(session=self._session,
-                             url=_REQUEST_USAGE_URL, 
-                             data_callback=_request_usage_callback,
-                             form_matcher=lambda form: form.attrib.get('action') == 
-                                '/enterprises/alphabet/settings/metered_exports')
+
+        return _get_and_submit_form(session=self._session,
+                                    url=_REQUEST_USAGE_URL,
+                                    data_callback=_request_usage_callback,
+                                    form_matcher=lambda form: form.attrib.get('action') ==
+                                    '/enterprises/alphabet/settings/metered_exports')
 
     def create_organization(self, org_name: str, contact_email: str,
-                            org_usage: OrganizationUsage, business_name: str = None):
+                            org_usage: OrganizationUsage, business_name: str = None) -> requests.Response:
         """Create the specified GitHub organization.
 
         Right now, only creates free tier organizations.
@@ -125,25 +125,26 @@ class Api(object):
             if org_usage == OrganizationUsage.BUSINESS:
                 data['organization[company_name]'] = business_name
 
-        _get_and_submit_form(session=self._session,
-                             url=_CREATE_ORG_URL, data_callback=_create_org_callback,
-                             form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
+        return _get_and_submit_form(session=self._session,
+                                    url=_CREATE_ORG_URL, data_callback=_create_org_callback,
+                                    form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
 
-    def install_application_in_organization(self, app_name: str, org_id: int):
+    def install_application_in_organization(self, app_name: str, org_id: int) -> requests.Response:
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
-        _get_and_submit_form(session=self._session,
-                             url=url,
-                             form_matcher=lambda form: app_name in form.attrib.get('action'))
+        return _get_and_submit_form(session=self._session,
+                                    url=url,
+                                    form_matcher=lambda form: app_name in form.attrib.get('action'))
 
-    def toggle_app_suspended(self, org_name: str, app_install_id: int):
+    def toggle_app_suspended(self, org_name: str, app_install_id: int) -> requests.Response:
         """Set this applicaiton install to be suspended or not."""
-        url = _APP_SUSPEND_URL.format(org_name=org_name, app_install_id=app_install_id)
+        url = _APP_SUSPEND_URL.format(
+            org_name=org_name, app_install_id=app_install_id)
 
-        _get_and_submit_form(session=self._session,
-                             url=url,
-                             form_matcher=lambda form: 'suspended' in form.attrib.get('action'))
+        return _get_and_submit_form(session=self._session,
+                                    url=url,
+                                    form_matcher=lambda form: 'suspended' in form.attrib.get('action'))
 
 
 if __name__ == "__main__":
