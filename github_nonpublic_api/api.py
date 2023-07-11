@@ -110,7 +110,8 @@ class Api(object):
                                     '/enterprises/alphabet/settings/metered_exports')
 
     def create_organization(self, org_name: str, contact_email: str,
-                            org_usage: OrganizationUsage, business_name: str = None) -> requests.Response:
+                            org_usage: OrganizationUsage, 
+                            business_name: str = None) -> requests.Response:
         """Create the specified GitHub organization.
 
         Right now, only creates free tier organizations.
@@ -129,7 +130,8 @@ class Api(object):
                                     url=_CREATE_ORG_URL, data_callback=_create_org_callback,
                                     form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
 
-    def install_application_in_organization(self, app_name: str, org_id: int) -> requests.Response:
+    def install_application_in_organization(self, app_name: str,
+                                             org_id: int) -> requests.Response:
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
@@ -144,7 +146,7 @@ class Api(object):
 
         return _get_and_submit_form(session=self._session,
                                     url=url,
-                                    form_matcher=lambda form: 'suspended' in form.attrib.get('action'))
+                                    form_matcher=lambda f: 'suspended' in f.attrib.get('action'))
 
 
 if __name__ == "__main__":
