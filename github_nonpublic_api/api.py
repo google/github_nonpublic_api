@@ -128,7 +128,7 @@ class Api(object):
 
         return _get_and_submit_form(session=self._session,
                                     url=_CREATE_ORG_URL, data_callback=_create_org_callback,
-                                    form_matcher=lambda form: form.attrib.get('id') == 'org-new-form')
+                                    form_matcher=lambda f: f.attrib.get('id') == 'org-new-form')
 
     def install_application_in_organization(self, app_name: str,
                                              org_id: int) -> requests.Response:
