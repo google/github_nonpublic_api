@@ -105,6 +105,7 @@ class TestApi(TestCase):
         AssertThat(self.session.post).WasCalled().Once().With(
             'https://github.com/apps/test-app/installations', data={
                 'authenticity_token': 'value',
+                'install_target': 'all',
             })
 
     def test_suspend_app_toggle(self):
