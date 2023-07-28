@@ -104,6 +104,7 @@ class Api(object):
             data['days'] = days
 
         action = f'/enterprises/{enterprise_name}/settings/metered_exports'
+        url = url = _REQUEST_USAGE_URL.format(enterprise_name=enterprise_name)
         return _get_and_submit_form(session=self._session,
                                     url=_REQUEST_USAGE_URL,
                                     data_callback=_request_usage_callback,
