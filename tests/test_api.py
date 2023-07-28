@@ -91,9 +91,9 @@ class TestApi(TestCase):
     def test_request_usage_report(self):
         self._seed_session_with_file(REQUEST_REPORT_FORM_HTML)
         gh = api.Api(session=self.session)
-        gh.request_usage(days=7)
+        gh.request_usage(enterprise_name='test-enterprise', days=7)
         AssertThat(self.session.post).WasCalled().Once().With(
-            'https://github.com/enterprises/alphabet/settings/metered_exports', data={
+            'https://github.com/enterprises/test-enterprise/settings/metered_exports', data={
                 'authenticity_token': 'value',
                 'days': 7,
             })
