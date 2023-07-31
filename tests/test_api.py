@@ -16,7 +16,8 @@ SUSPEND_APP_FORM = os.path.join(
     os.path.dirname(__file__), 'suspend_app_form.html')
 REQUEST_REPORT_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'request_report_form.html')
-
+DOWNLOAD_USAGE_REPORT_CSV = os.path.join(
+    os.path.dirname(__file__), 'usage_report.csv')
 
 class TestApi(TestCase):
     def _seed_session_with_file(self, filename):
@@ -116,3 +117,9 @@ class TestApi(TestCase):
             'https://github.com/long/url/suspended', data={
                 'authenticity_token': 'value',
             })
+        
+    def test_download_usage_report(self):
+        self._seed_session_with_file(DOWNLOAD_USAGE_REPORT_CSV)
+        gh = api.Api(session=self.session)
+        gh.download_usage_report(enterprise_name='test-enterprise', report_id=1)
+        AssertThat(self.session.get).WasCalled().Once().With('https://github.com/enterprises/test-enterprise/settings/metered_exports/1')
