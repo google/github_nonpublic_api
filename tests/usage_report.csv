@@ -1,0 +1,9 @@
+Date,Product,SKU,Quantity,Unit Type,Price Per Unit ($),Multiplier,Owner,Repository Slug,Username,Actions Workflow,Notes
+2023-06-26,Actions,Compute - UBUNTU,84,minute,0.008,1.0,testorg,testrepo,testuser,.github/workflows/ci.yaml,
+2023-06-26,Actions,Compute - UBUNTU,15,minute,0.008,1.0,testorg,testrepo,testuser,.github/workflows/ci.yaml,
+2023-06-26,Actions,Compute - WINDOWS,18,minute,0.016,2.0,testorg,testrepo,testuser,.github/workflows/ci.yaml,
+2023-06-26,Actions,Compute - WINDOWS,5,minute,0.016,2.0,testorg,testrepo,testuser,.github/workflows/ci.yaml,
+2023-06-27,Actions,Compute - UBUNTU,18,minute,0.008,1.0,testorg,testrepo,obada-ab,.github/workflows/ci.yaml,
+2023-06-27,Actions,Compute - WINDOWS,2,minute,0.016,2.0,testorg,testrepo,obada-ab,.github/workflows/ci.yaml,
+2023-06-28,Actions,Compute - UBUNTU,45,minute,0.008,1.0,testorg,testrepo,obada-ab,.github/workflows/ci.yaml,
+2023-06-28,Actions,Compute - WINDOWS,12,minute,0.016,2.0,testorg,testrepo,obada-ab,.github/workflows/ci.yaml,

@@ -50,6 +50,12 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     response.raise_for_status()
     return response
 
+def _get_url_with_session(session, url: str):
+    logging.info('Fetching URL %s', url)
+    response = session.get(url)
+    response.raise_for_status()
+    return response
+
 
 def create_login_session(username: str, password: str,
                          tfa_callback, session: requests.Session = None) -> requests.Session:
@@ -73,6 +79,7 @@ _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
 _REQUEST_USAGE_URL = 'https://github.com/enterprises/{enterprise_name}/settings/billing'
+_USAGE_REPORT_URL = 'https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}'
 
 
 class OrganizationUsage(Enum):
@@ -153,6 +160,11 @@ class Api(object):
         return _get_and_submit_form(session=self._session,
                                     url=url,
                                     form_matcher=lambda f: 'suspended' in f.attrib.get('action'))
+    
+    def download_usage_report(self, enterprise_name: str, report_id: int) -> requests.Response:
+        """Download a usage report based on an id recieved in an email"""
+        url = _USAGE_REPORT_URL.format(enterprise_name=enterprise_name, report_id=report_id)
+        return _get_url_with_session(session=self._session, url=url)
 
 
 if __name__ == "__main__":
