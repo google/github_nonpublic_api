@@ -78,7 +78,7 @@ def create_login_session(username: str, password: str,
 _CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
 _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
-_REQUEST_USAGE_URL = 'https://github.com/enterprises/alphabet/settings/billing'
+_REQUEST_USAGE_URL = 'https://github.com/enterprises/{enterprise_name}/settings/billing'
 _USAGE_REPORT_URL = 'https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}'
 
 
@@ -101,7 +101,7 @@ class Api(object):
         self._session = session or create_login_session(
             username=username, password=password, tfa_callback=tfa_callback, session=session)
 
-    def request_usage(self, days: int = 30) -> requests.Response:
+    def request_usage(self, enterprise_name: str, days: int = 30) -> requests.Response:
         """Requests a GitHub usage report.
 
         Github will send an email link when the report is available.
@@ -110,11 +110,13 @@ class Api(object):
         def _request_usage_callback(data):
             data['days'] = days
 
+        action = f'/enterprises/{enterprise_name}/settings/metered_exports'
+        url = url = _REQUEST_USAGE_URL.format(enterprise_name=enterprise_name)
         return _get_and_submit_form(session=self._session,
-                                    url=_REQUEST_USAGE_URL,
+                                    url=url,
                                     data_callback=_request_usage_callback,
                                     form_matcher=lambda form: form.attrib.get('action') ==
-                                    '/enterprises/alphabet/settings/metered_exports')
+                                    action)
 
     def create_organization(self, org_name: str, contact_email: str,
                             org_usage: OrganizationUsage, 
