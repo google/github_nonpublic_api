@@ -8,5 +8,5 @@ requests==2.31.0
 ruff==0.0.280
 six==1.16.0
 typing_extensions==4.7.1
-urllib3==2.0.3
+urllib3==2.0.4
 webencodings==0.5.1
