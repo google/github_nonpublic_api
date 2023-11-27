@@ -62,6 +62,9 @@ def create_login_session(username: str, password: str,
     """Create a requests.Session object with logged in GitHub cookies for the user."""
     session = session or requests.Session()
 
+    # Clear cookies before re-authentication
+    session.cookies.clear()
+
     def _login_callback(data):
         data.update(dict(login=username, password=password))
     _get_and_submit_form(
