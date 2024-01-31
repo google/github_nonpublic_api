@@ -29,7 +29,6 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
             submit_form = form
             break
     if submit_form is None:
-        logging.error('Unable to find form at URL %s', url)
         raise ValueError('Unable to find form')
 
     action_url = submit_form.attrib['action']
@@ -51,13 +50,8 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     submit_url = urljoin(url, action_url)
     logging.info('Posting form to URL %s', submit_url)
 
-    try:
-        response = session.post(submit_url, data=data)
-        response.raise_for_status()
-        logging.info('Form submitted successfully to URL %s', submit_url)
-    except requests.exceptions.RequestException as e:
-        logging.error('Error submitting form to URL %s: %s', submit_url, str(e))
-        raise
+    response = session.post(submit_url, data=data)
+    response.raise_for_status()
     return response
 
 def _get_url_with_session(session, url: str):
