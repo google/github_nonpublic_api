@@ -16,6 +16,10 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     response = session.get(url)
     response.raise_for_status()
 
+    logging.info('Fetching URL %s', response.url)
+    for redirect_response in response.history:
+        logging.info('Redirected from: %s', redirect_response.url)
+
     doc = html5lib.parse(response.text, namespaceHTMLElements=False)
     forms = doc.findall('.//form')
 
