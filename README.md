@@ -24,3 +24,35 @@ Apache header:
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+## For Developers
+
+Create a new virtual environment and install the required tools.
+
+```bash
+python -m venv ~/{some envpath}/github_nonpublic
+
+pip install --upgrade setuptools,build,pip
+
+pip install -r requirements.txt
+```
+
+Testing:
+
+```bash
+python -m pytest
+```
+
+Linting:
+
+```bash
+ruff --output-format=github --select=E9,F63,F7,F82 --target-version=py37 .
+
+ruff --output-format=github --target-version=py37 .
+```
+
+Adding license headers:
+
+```bash
+go run github.com/google/addlicense@v1.1.1 -c "The Authors (see AUTHORS file)" -l apache -v ./**/*.py
+```

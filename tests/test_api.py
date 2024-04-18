@@ -1,3 +1,17 @@
+# Copyright 2024 The Authors (see AUTHORS file)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """Unit tests for api.py."""
 
 import os
@@ -18,6 +32,8 @@ REQUEST_REPORT_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'request_report_form.html')
 DOWNLOAD_USAGE_REPORT_CSV = os.path.join(
     os.path.dirname(__file__), 'usage_report.csv')
+UPDATE_APP_PERMISSIONS_FORM_HTML = os.path.join(
+    os.path.dirname(__file__), 'update_app_permissions.html')
 
 class TestApi(TestCase):
     def _seed_session_with_file(self, filename):
@@ -54,7 +70,7 @@ class TestApi(TestCase):
 
         with AssertThat(ValueError).IsRaised():
             api._get_and_submit_form(
-                session=self.session, url='http://github.com', 
+                session=self.session, url='http://github.com',
                 form_matcher=lambda form: False)
 
     def test_create_business_org(self):
@@ -88,7 +104,7 @@ class TestApi(TestCase):
                 'organization[profile_name]': 'test',
                 'organization[login]': 'test',
             })
-        
+
     def test_request_usage_report(self):
         self._seed_session_with_file(REQUEST_REPORT_FORM_HTML)
         gh = api.Api(session=self.session)
@@ -117,9 +133,23 @@ class TestApi(TestCase):
             'https://github.com/long/url/suspended', data={
                 'authenticity_token': 'value',
             })
-        
+
     def test_download_usage_report(self):
         self._seed_session_with_file(DOWNLOAD_USAGE_REPORT_CSV)
         gh = api.Api(session=self.session)
         gh.download_usage_report(enterprise_name='test-enterprise', report_id=1)
         AssertThat(self.session.get).WasCalled().Once().With('https://github.com/enterprises/test-enterprise/settings/metered_exports/1')
+
+    def test_update_app_permissions(self):
+        self._seed_session_with_file(UPDATE_APP_PERMISSIONS_FORM_HTML)
+        gh = api.Api(session=self.session)
+        gh.approve_updated_app_permissions(org_name='test-org', app_install_id=42)
+        AssertThat(self.session.post).WasCalled().Once().With(
+            'https://github.com/organizations/test-org/settings/installations/42/permissions/update',
+            data={
+                '_method': 'put',
+                'authenticity_token': 'value',
+                'version_id': '112233',
+                'integration_fingerprint': 'value',
+            },
+        )
