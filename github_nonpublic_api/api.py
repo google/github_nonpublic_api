@@ -1,3 +1,17 @@
+# Copyright 2024 The Authors (see AUTHORS file)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """An API to do things that aren't in the official public GitHub REST API."""
 
 import os.path
@@ -54,6 +68,7 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
     response.raise_for_status()
     return response
 
+
 def _get_url_with_session(session, url: str):
     logging.info('Fetching URL %s', url)
     response = session.get(url)
@@ -71,11 +86,13 @@ def create_login_session(username: str, password: str,
 
     def _login_callback(data):
         data.update(dict(login=username, password=password))
+
     _get_and_submit_form(
         session=session, url='https://github.com/login', data_callback=_login_callback)
 
     def _tfa_callback(data):
         data.update(dict(otp=tfa_callback()))
+
     _get_and_submit_form(
         session=session, url='https://github.com/sessions/two-factor', data_callback=_tfa_callback)
 
@@ -87,6 +104,7 @@ _INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permiss
 _APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
 _REQUEST_USAGE_URL = 'https://github.com/enterprises/{enterprise_name}/settings/billing'
 _USAGE_REPORT_URL = 'https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}'
+_UPDATE_APP_INSTALL_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}/permissions/update'
 
 
 class OrganizationUsage(Enum):
@@ -147,7 +165,7 @@ class Api(object):
                                     form_matcher=lambda f: f.attrib.get('id') == 'org-new-form')
 
     def install_application_in_organization(self, app_name: str,
-                                             org_id: int) -> requests.Response:
+                                            org_id: int) -> requests.Response:
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
@@ -167,15 +185,33 @@ class Api(object):
         return _get_and_submit_form(session=self._session,
                                     url=url,
                                     form_matcher=lambda f: 'suspended' in f.attrib.get('action'))
-    
+
     def download_usage_report(self, enterprise_name: str, report_id: int) -> requests.Response:
         """Download a usage report based on an id recieved in an email"""
         url = _USAGE_REPORT_URL.format(enterprise_name=enterprise_name, report_id=report_id)
         return _get_url_with_session(session=self._session, url=url)
+
+    def approve_updated_app_permissions(
+        self,
+        org_name: str,
+        app_install_id: str,
+    ) -> requests.Response:
+        """Approve a request for updated permissions for a GitHub app installation in an org"""
+
+        return _get_and_submit_form(
+            session=self._session,
+            url=_UPDATE_APP_INSTALL_URL.format(
+                org_name=org_name,
+                app_install_id=app_install_id,
+            ),
+            form_matcher=lambda f: f.attrib.get('class')
+            == 'js-integrations-install-form',
+        )
 
 
 if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser('~/github.ini'), _inspec=True)
 
     api = Api(config['username'], config['password'],
-              tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now())
+              tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now(),
+    )
