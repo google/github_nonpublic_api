@@ -23,19 +23,22 @@ import pyotp
 import requests
 from absl import logging
 from configobj import ConfigObj
+from typing import Optional
 
 
-def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lambda form: True):
-    logging.info('Fetching URL %s', url)
+def _get_and_submit_form(
+    session, url: str, data_callback=None, form_matcher=lambda form: True
+):
+    logging.info("Fetching URL %s", url)
     response = session.get(url)
     response.raise_for_status()
 
-    logging.info('Fetching URL %s', response.url)
+    logging.info("Fetching URL %s", response.url)
     for redirect_response in response.history:
-        logging.info('Redirected from: %s', redirect_response.url)
+        logging.info("Redirected from: %s", redirect_response.url)
 
     doc = html5lib.parse(response.text, namespaceHTMLElements=False)
-    forms = doc.findall('.//form')
+    forms = doc.findall(".//form")
 
     submit_form = None
     for form in forms:
@@ -43,26 +46,26 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
             submit_form = form
             break
     if submit_form is None:
-        raise ValueError('Unable to find form')
+        raise ValueError("Unable to find form")
 
-    action_url = submit_form.attrib['action']
+    action_url = submit_form.attrib["action"]
     # Look at all the inputs under the given form.
-    inputs = submit_form.findall('.//input')
+    inputs = submit_form.findall(".//input")
 
     data = dict()
     for form_input in inputs:
-        value = form_input.attrib.get('value')
-        if value and 'name' in form_input.attrib:
-            data[form_input.attrib['name']] = value
+        value = form_input.attrib.get("value")
+        if value and "name" in form_input.attrib:
+            data[form_input.attrib["name"]] = value
 
     # Have the caller provide additional data
     if data_callback:
         data_callback(data)
 
-    logging.debug('Form data: %s', str(data))
+    logging.debug("Form data: %s", str(data))
 
     submit_url = urljoin(url, action_url)
-    logging.info('Posting form to URL %s', submit_url)
+    logging.info("Posting form to URL %s", submit_url)
 
     response = session.post(submit_url, data=data)
     response.raise_for_status()
@@ -70,14 +73,15 @@ def _get_and_submit_form(session, url: str, data_callback=None, form_matcher=lam
 
 
 def _get_url_with_session(session, url: str):
-    logging.info('Fetching URL %s', url)
+    logging.info("Fetching URL %s", url)
     response = session.get(url)
     response.raise_for_status()
     return response
 
 
-def create_login_session(username: str, password: str,
-                         tfa_callback, session: requests.Session = None) -> requests.Session:
+def create_login_session(
+    username: str, password: str, tfa_callback, session: requests.Session = None
+) -> requests.Session:
     """Create a requests.Session object with logged in GitHub cookies for the user."""
     session = session or requests.Session()
 
@@ -88,30 +92,35 @@ def create_login_session(username: str, password: str,
         data.update(dict(login=username, password=password))
 
     _get_and_submit_form(
-        session=session, url='https://github.com/login', data_callback=_login_callback)
+        session=session, url="https://github.com/login", data_callback=_login_callback
+    )
 
     def _tfa_callback(data):
         data.update(dict(otp=tfa_callback()))
 
     _get_and_submit_form(
-        session=session, url='https://github.com/sessions/two-factor', data_callback=_tfa_callback)
+        session=session,
+        url="https://github.com/sessions/two-factor",
+        data_callback=_tfa_callback,
+    )
 
     return session
 
 
-_CREATE_ORG_URL = 'https://github.com/account/organizations/new?plan=free'
-_INSTALL_APP_URL = 'https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}'
-_APP_SUSPEND_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}'
-_REQUEST_USAGE_URL = 'https://github.com/enterprises/{enterprise_name}/settings/billing'
-_USAGE_REPORT_URL = 'https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}'
-_UPDATE_APP_INSTALL_URL = 'https://github.com/organizations/{org_name}/settings/installations/{app_install_id}/permissions/update'
+_CREATE_ORG_URL = "https://github.com/account/organizations/new?plan=free"
+_INSTALL_APP_URL = "https://github.com/apps/{app_name}/installations/new/permissions?target_id={org_id}"
+_APP_SUSPEND_URL = "https://github.com/organizations/{org_name}/settings/installations/{app_install_id}"
+_REQUEST_USAGE_URL = "https://github.com/enterprises/{enterprise_name}/settings/billing"
+_USAGE_REPORT_URL = "https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}"
+_UPDATE_APP_INSTALL_URL = "https://github.com/organizations/{org_name}/settings/installations/{app_install_id}/permissions/update"
+_UPDATE_SECURITY_ANALYSIS_URL = "https://github.com/organizations/{org_name}/settings/security_analysis"
 
 
 class OrganizationUsage(Enum):
     """Organization Usage for Organization Creation."""
 
-    PERSONAL = 'standard'
-    BUSINESS = 'corporate'
+    PERSONAL = "standard"
+    BUSINESS = "corporate"
 
 
 class Api(object):
@@ -121,10 +130,19 @@ class Api(object):
     to pretend to be a real user.
     """
 
-    def __init__(self, username: str = None, password: str = None, tfa_callback=None,
-                 session: requests.Session = None):
+    def __init__(
+        self,
+        username: str = None,
+        password: str = None,
+        tfa_callback=None,
+        session: requests.Session = None,
+    ):
         self._session = session or create_login_session(
-            username=username, password=password, tfa_callback=tfa_callback, session=session)
+            username=username,
+            password=password,
+            tfa_callback=tfa_callback,
+            session=session,
+        )
 
     def request_usage(self, enterprise_name: str, days: int = 30) -> requests.Response:
         """Requests a GitHub usage report.
@@ -133,62 +151,80 @@ class Api(object):
         """
 
         def _request_usage_callback(data):
-            data['days'] = days
+            data["days"] = days
 
-        action = f'/enterprises/{enterprise_name}/settings/metered_exports'
+        action = f"/enterprises/{enterprise_name}/settings/metered_exports"
         url = url = _REQUEST_USAGE_URL.format(enterprise_name=enterprise_name)
-        return _get_and_submit_form(session=self._session,
-                                    url=url,
-                                    data_callback=_request_usage_callback,
-                                    form_matcher=lambda form: form.attrib.get('action') ==
-                                    action)
+        return _get_and_submit_form(
+            session=self._session,
+            url=url,
+            data_callback=_request_usage_callback,
+            form_matcher=lambda form: form.attrib.get("action") == action,
+        )
 
-    def create_organization(self, org_name: str, contact_email: str,
-                            org_usage: OrganizationUsage, 
-                            business_name: str = None) -> requests.Response:
+    def create_organization(
+        self,
+        org_name: str,
+        contact_email: str,
+        org_usage: OrganizationUsage,
+        business_name: str = None,
+    ) -> requests.Response:
         """Create the specified GitHub organization.
 
         Right now, only creates free tier organizations.
         """
 
         def _create_org_callback(data):
-            data['organization[profile_name]'] = org_name
-            data['organization[login]'] = org_name
-            data['organization[billing_email]'] = contact_email
-            data['terms_of_service_type'] = org_usage.value
-            data['agreed_to_terms'] = 'yes'
+            data["organization[profile_name]"] = org_name
+            data["organization[login]"] = org_name
+            data["organization[billing_email]"] = contact_email
+            data["terms_of_service_type"] = org_usage.value
+            data["agreed_to_terms"] = "yes"
             if org_usage == OrganizationUsage.BUSINESS:
-                data['organization[company_name]'] = business_name
+                data["organization[company_name]"] = business_name
 
-        return _get_and_submit_form(session=self._session,
-                                    url=_CREATE_ORG_URL, data_callback=_create_org_callback,
-                                    form_matcher=lambda f: f.attrib.get('id') == 'org-new-form')
+        return _get_and_submit_form(
+            session=self._session,
+            url=_CREATE_ORG_URL,
+            data_callback=_create_org_callback,
+            form_matcher=lambda f: f.attrib.get("id") == "org-new-form",
+        )
 
-    def install_application_in_organization(self, app_name: str,
-                                            org_id: int) -> requests.Response:
+    def install_application_in_organization(
+        self, app_name: str, org_id: int
+    ) -> requests.Response:
         """Installs the specified app on the given organization."""
         url = _INSTALL_APP_URL.format(app_name=app_name, org_id=org_id)
 
         def _install_app_callback(data):
-            data['install_target'] = 'all'
+            data["install_target"] = "all"
 
-        _get_and_submit_form(session=self._session,
-                             url=url,
-                             data_callback=_install_app_callback,
-                             form_matcher=lambda form: app_name in form.attrib.get('action'))
+        _get_and_submit_form(
+            session=self._session,
+            url=url,
+            data_callback=_install_app_callback,
+            form_matcher=lambda form: app_name in form.attrib.get("action"),
+        )
 
-    def toggle_app_suspended(self, org_name: str, app_install_id: int) -> requests.Response:
+    def toggle_app_suspended(
+        self, org_name: str, app_install_id: int
+    ) -> requests.Response:
         """Set this applicaiton install to be suspended or not."""
-        url = _APP_SUSPEND_URL.format(
-            org_name=org_name, app_install_id=app_install_id)
+        url = _APP_SUSPEND_URL.format(org_name=org_name, app_install_id=app_install_id)
 
-        return _get_and_submit_form(session=self._session,
-                                    url=url,
-                                    form_matcher=lambda f: 'suspended' in f.attrib.get('action'))
+        return _get_and_submit_form(
+            session=self._session,
+            url=url,
+            form_matcher=lambda f: "suspended" in f.attrib.get("action"),
+        )
 
-    def download_usage_report(self, enterprise_name: str, report_id: int) -> requests.Response:
+    def download_usage_report(
+        self, enterprise_name: str, report_id: int
+    ) -> requests.Response:
         """Download a usage report based on an id recieved in an email"""
-        url = _USAGE_REPORT_URL.format(enterprise_name=enterprise_name, report_id=report_id)
+        url = _USAGE_REPORT_URL.format(
+            enterprise_name=enterprise_name, report_id=report_id
+        )
         return _get_url_with_session(session=self._session, url=url)
 
     def approve_updated_app_permissions(
@@ -204,14 +240,37 @@ class Api(object):
                 org_name=org_name,
                 app_install_id=app_install_id,
             ),
-            form_matcher=lambda f: f.attrib.get('class')
-            == 'js-integrations-install-form',
+            form_matcher=lambda f: f.attrib.get("class")
+            == "js-integrations-install-form",
+        )
+
+    def update_security_analysis_settings(
+        self,
+        org_name: str,
+        code_scanning_autofix_third_party_tools: Optional[bool] = None,
+        code_scanning_autofix: Optional[bool] = None,
+    ):
+        request = dict()
+        if code_scanning_autofix is not None:
+            request['code_scanning_autofix'] = 'enabled' if code_scanning_autofix else 'disabled'
+        if code_scanning_autofix_third_party_tools is not None:
+            request['code_scanning_autofix_third_party_tools'] = 'enabled' if code_scanning_autofix_third_party_tools else 'disabled'
+
+        return _get_and_submit_form(
+            session=self._session,
+            url=_UPDATE_SECURITY_ANALYSIS_URL.format(
+                org_name=org_name,
+            ),
+            # This is kinda hacky but should work
+            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class")
         )
 
 
 if __name__ == "__main__":
-    config = ConfigObj(os.path.expanduser('~/github.ini'), _inspec=True)
+    config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
 
-    api = Api(config['username'], config['password'],
-              tfa_callback=lambda: pyotp.TOTP(config['otp_seed']).now(),
+    api = Api(
+        config["username"],
+        config["password"],
+        tfa_callback=lambda: pyotp.TOTP(config["otp_seed"]).now(),
     )
