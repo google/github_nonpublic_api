@@ -32,6 +32,9 @@ DOWNLOAD_USAGE_REPORT_CSV = os.path.join(
     os.path.dirname(__file__), 'usage_report.csv')
 UPDATE_APP_PERMISSIONS_FORM_HTML = os.path.join(
     os.path.dirname(__file__), 'update_app_permissions.html')
+SECURITY_ANALYSIS_FORM_HTML = os.path.join(
+    os.path.dirname(__file__), 'security_analysis_form.html')
+
 
 class TestApi(TestCase):
     def _seed_session_with_file(self, filename):
@@ -149,5 +152,18 @@ class TestApi(TestCase):
                 'authenticity_token': 'value',
                 'version_id': '112233',
                 'integration_fingerprint': 'value',
+            },
+        )
+    
+    def test_update_security_analysis_settings(self):
+        self._seed_session_with_file(SECURITY_ANALYSIS_FORM_HTML)
+        gh = api.Api(session=self.session)
+        gh.update_security_analysis_settings(org_name='test-org', code_scanning_autofix=False)
+        self.session.post.assert_called_once_with(
+            'https://github.com/organizations/test-org/settings/security_analysis/update?owner=test-org',
+            data={
+                '_method': 'put',
+                'authenticity_token': 'value',
+                'code_scanning_autofix': 'enabled',
             },
         )
