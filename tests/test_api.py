@@ -17,8 +17,6 @@
 import os
 from unittest import TestCase, mock
 
-from truth.truth import AssertThat
-
 from github_nonpublic_api import api
 
 GITHUB_FORM_HTML = os.path.join(os.path.dirname(__file__), 'github_form.html')
@@ -52,7 +50,7 @@ class TestApi(TestCase):
         api._get_and_submit_form(
             session=self.session, url='http://github.com', data_callback=_data_callback)
 
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'http://github.com/foo', data=dict(add='yes', key='value'))
 
     def test_get_and_submit_form_by_id(self):
@@ -62,13 +60,13 @@ class TestApi(TestCase):
             session=self.session, url='http://github.com',
             form_matcher=lambda form: form.attrib.get('id') == 'form2')
 
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'http://github.com/form2', data=dict(key='value2'))
 
     def test_get_and_submit_form_by_id_error(self):
         self._seed_session_with_file(GITHUB_FORM_HTML)
 
-        with AssertThat(ValueError).IsRaised():
+        with self.assertRaises(ValueError):
             api._get_and_submit_form(
                 session=self.session, url='http://github.com',
                 form_matcher=lambda form: False)
@@ -79,7 +77,7 @@ class TestApi(TestCase):
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
                                org_usage=api.OrganizationUsage.BUSINESS,
                                business_name='A Fake Business')
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/account/organizations/new_org', data={
                 'authenticity_token': 'value',
                 'agreed_to_terms': 'yes',
@@ -95,7 +93,7 @@ class TestApi(TestCase):
         gh = api.Api(session=self.session)
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
                                org_usage=api.OrganizationUsage.PERSONAL)
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/account/organizations/new_org', data={
                 'authenticity_token': 'value',
                 'agreed_to_terms': 'yes',
@@ -109,7 +107,7 @@ class TestApi(TestCase):
         self._seed_session_with_file(REQUEST_REPORT_FORM_HTML)
         gh = api.Api(session=self.session)
         gh.request_usage(enterprise_name='test-enterprise', days=7)
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/enterprises/test-enterprise/settings/metered_exports', data={
                 'authenticity_token': 'value',
                 'days': 7,
@@ -119,7 +117,7 @@ class TestApi(TestCase):
         self._seed_session_with_file(ADD_APP_FORM_HTML)
         gh = api.Api(session=self.session)
         gh.install_application_in_organization(app_name='test-app', org_id=42)
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/apps/test-app/installations', data={
                 'authenticity_token': 'value',
                 'install_target': 'all',
@@ -129,7 +127,7 @@ class TestApi(TestCase):
         self._seed_session_with_file(SUSPEND_APP_FORM)
         gh = api.Api(session=self.session)
         gh.toggle_app_suspended(org_name='test-org', app_install_id=42)
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/long/url/suspended', data={
                 'authenticity_token': 'value',
             })
@@ -138,13 +136,13 @@ class TestApi(TestCase):
         self._seed_session_with_file(DOWNLOAD_USAGE_REPORT_CSV)
         gh = api.Api(session=self.session)
         gh.download_usage_report(enterprise_name='test-enterprise', report_id=1)
-        AssertThat(self.session.get).WasCalled().Once().With('https://github.com/enterprises/test-enterprise/settings/metered_exports/1')
+        self.session.get.assert_called_once_with('https://github.com/enterprises/test-enterprise/settings/metered_exports/1')
 
     def test_update_app_permissions(self):
         self._seed_session_with_file(UPDATE_APP_PERMISSIONS_FORM_HTML)
         gh = api.Api(session=self.session)
         gh.approve_updated_app_permissions(org_name='test-org', app_install_id=42)
-        AssertThat(self.session.post).WasCalled().Once().With(
+        self.session.post.assert_called_once_with(
             'https://github.com/organizations/test-org/settings/installations/42/permissions/update',
             data={
                 '_method': 'put',
