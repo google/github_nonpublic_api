@@ -1,5 +1,5 @@
 absl-py==2.1.0
-configobj==5.0.8
+configobj==5.0.9
 html5lib==1.1
 pyotp==2.9.0
 pytest==8.2.2
