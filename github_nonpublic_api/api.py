@@ -16,6 +16,7 @@
 
 import os.path
 from enum import Enum
+import re
 from urllib.parse import urljoin
 
 import html5lib
@@ -112,9 +113,13 @@ _INSTALL_APP_URL = "https://github.com/apps/{app_name}/installations/new/permiss
 _APP_SUSPEND_URL = "https://github.com/organizations/{org_name}/settings/installations/{app_install_id}"
 _REQUEST_USAGE_URL = "https://github.com/enterprises/{enterprise_name}/settings/billing"
 _USAGE_REPORT_URL = "https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}"
-_REQUEST_DORMANTUSERS_URL = "https://github.com/enterprises/{enterprise_name}/settings/billing"
+_REQUEST_DORMANTUSERS_URL = (
+    "https://github.com/enterprises/{enterprise_name}/settings/billing"
+)
 _UPDATE_APP_INSTALL_URL = "https://github.com/organizations/{org_name}/settings/installations/{app_install_id}/permissions/update"
-_UPDATE_SECURITY_ANALYSIS_URL = "https://github.com/organizations/{org_name}/settings/security_analysis"
+_UPDATE_SECURITY_ANALYSIS_URL = (
+    "https://github.com/organizations/{org_name}/settings/security_analysis"
+)
 
 
 class OrganizationUsage(Enum):
@@ -227,7 +232,6 @@ class Api(object):
             enterprise_name=enterprise_name, report_id=report_id
         )
         return _get_url_with_session(session=self._session, url=url)
-    
 
     def request_dormant_users_report(self, enterprise_name: str) -> requests.Response:
         """Requests a GitHub dormant users report.
@@ -235,18 +239,21 @@ class Api(object):
         Github will send an email link when the report is available.
         """
 
-        action = f'/enterprises/{enterprise_name}/settings/dormant-users/exports'
+        action = f"/enterprises/{enterprise_name}/settings/dormant-users/exports"
         url = url = _REQUEST_DORMANTUSERS_URL.format(enterprise_name=enterprise_name)
-        return _get_and_submit_form(session=self._session,
-                                    url=url,
-                                    form_matcher=lambda form: form.attrib.get('action') ==
-                                    action)
+        return _get_and_submit_form(
+            session=self._session,
+            url=url,
+            form_matcher=lambda form: form.attrib.get("action") == action,
+        )
 
     def download_dormant_users_report(self, enterprise_name: str) -> requests.Response:
         """Download a usage report based on an id received in an email"""
         url = _REQUEST_DORMANTUSERS_URL.format(enterprise_name=enterprise_name)
         page = _get_url_with_session(session=self._session, url=url)
-        link =re.search(r'https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}')
+        link = re.search(
+            r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}"
+        )
         return _get_url_with_session(session=self._session, url=link.group(0))
 
     def approve_updated_app_permissions(
@@ -274,9 +281,13 @@ class Api(object):
     ):
         request = dict()
         if code_scanning_autofix is not None:
-            request['code_scanning_autofix'] = 'enabled' if code_scanning_autofix else 'disabled'
+            request["code_scanning_autofix"] = (
+                "enabled" if code_scanning_autofix else "disabled"
+            )
         if code_scanning_autofix_third_party_tools is not None:
-            request['code_scanning_autofix_third_party_tools'] = 'enabled' if code_scanning_autofix_third_party_tools else 'disabled'
+            request["code_scanning_autofix_third_party_tools"] = (
+                "enabled" if code_scanning_autofix_third_party_tools else "disabled"
+            )
 
         return _get_and_submit_form(
             session=self._session,
@@ -284,15 +295,16 @@ class Api(object):
                 org_name=org_name,
             ),
             # This is kinda hacky but should work
-            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class")
+            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class"),
         )
+
 
 import getpass
 
 if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
 
-    otp = getpass.getpass(prompt='OTP: ')
+    otp = getpass.getpass(prompt="OTP: ")
     print(otp)
 
     api = Api(
