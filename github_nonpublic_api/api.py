@@ -304,11 +304,9 @@ import getpass
 if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
 
-    otp = getpass.getpass(prompt="OTP: ")
-    print(otp)
 
     api = Api(
         config["username"],
         config["password"],
-        tfa_callback=lambda: otp,
+        tfa_callback=lambda: pyotp.TOTP(config["otp_seed"]).now(),
     )
