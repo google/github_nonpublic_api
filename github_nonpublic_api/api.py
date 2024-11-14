@@ -252,7 +252,8 @@ class Api(object):
         url = _REQUEST_DORMANTUSERS_URL.format(enterprise_name=enterprise_name)
         page = _get_url_with_session(session=self._session, url=url)
         link = re.search(
-            r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}"
+            r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}",
+            page.content
         )
         return _get_url_with_session(session=self._session, url=link.group(0))
 
@@ -297,9 +298,6 @@ class Api(object):
             # This is kinda hacky but should work
             form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class"),
         )
-
-
-import getpass
 
 if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
