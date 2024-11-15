@@ -1,7 +1,7 @@
 name: "Python lint and test"
 
 on:
-  pull_request:  
+  push:  
   workflow_dispatch:
 
 jobs:
