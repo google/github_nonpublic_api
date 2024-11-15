@@ -255,6 +255,8 @@ class Api(object):
             r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}",
             page.content
         )
+        if link is None:
+            raise ValueError('Unable to find dormant users report link in content.')
         return _get_url_with_session(session=self._session, url=link.group(0))
 
     def approve_updated_app_permissions(
