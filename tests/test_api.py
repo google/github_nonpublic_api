@@ -76,7 +76,7 @@ class TestApi(TestCase):
 
     def test_create_business_org(self):
         self._seed_session_with_file(NEW_ORG_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
                                org_usage=api.OrganizationUsage.BUSINESS,
                                business_name='A Fake Business')
@@ -93,7 +93,7 @@ class TestApi(TestCase):
 
     def test_create_personal_org(self):
         self._seed_session_with_file(NEW_ORG_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.create_organization(org_name='test', contact_email='nobody@google.com',
                                org_usage=api.OrganizationUsage.PERSONAL)
         self.session.post.assert_called_once_with(
@@ -108,7 +108,7 @@ class TestApi(TestCase):
 
     def test_request_usage_report(self):
         self._seed_session_with_file(REQUEST_REPORT_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.request_usage(enterprise_name='test-enterprise', days=7)
         self.session.post.assert_called_once_with(
             'https://github.com/enterprises/test-enterprise/settings/metered_exports', data={
@@ -118,7 +118,7 @@ class TestApi(TestCase):
 
     def test_install_app_on_org(self):
         self._seed_session_with_file(ADD_APP_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.install_application_in_organization(app_name='test-app', org_id=42)
         self.session.post.assert_called_once_with(
             'https://github.com/apps/test-app/installations', data={
@@ -128,7 +128,7 @@ class TestApi(TestCase):
 
     def test_suspend_app_toggle(self):
         self._seed_session_with_file(SUSPEND_APP_FORM)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.toggle_app_suspended(org_name='test-org', app_install_id=42)
         self.session.post.assert_called_once_with(
             'https://github.com/long/url/suspended', data={
@@ -137,13 +137,13 @@ class TestApi(TestCase):
 
     def test_download_usage_report(self):
         self._seed_session_with_file(DOWNLOAD_USAGE_REPORT_CSV)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.download_usage_report(enterprise_name='test-enterprise', report_id=1)
         self.session.get.assert_called_once_with('https://github.com/enterprises/test-enterprise/settings/metered_exports/1')
 
     def test_update_app_permissions(self):
         self._seed_session_with_file(UPDATE_APP_PERMISSIONS_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.approve_updated_app_permissions(org_name='test-org', app_install_id=42)
         self.session.post.assert_called_once_with(
             'https://github.com/organizations/test-org/settings/installations/42/permissions/update',
@@ -157,7 +157,7 @@ class TestApi(TestCase):
     
     def test_update_security_analysis_settings(self):
         self._seed_session_with_file(SECURITY_ANALYSIS_FORM_HTML)
-        gh = api.Api(session=self.session)
+        gh = api.Api(username='user', password='pass', session=self.session)
         gh.update_security_analysis_settings(org_name='test-org', code_scanning_autofix=False)
         self.session.post.assert_called_once_with(
             'https://github.com/organizations/test-org/settings/security_analysis/update?owner=test-org',
