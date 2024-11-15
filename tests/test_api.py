@@ -144,7 +144,7 @@ class TestApi(TestCase):
     def test_update_app_permissions(self):
         self._seed_session_with_file(UPDATE_APP_PERMISSIONS_FORM_HTML)
         gh = api.Api(username='user', password='pass', session=self.session)
-        gh.approve_updated_app_permissions(org_name='test-org', app_install_id=42)
+        gh.approve_updated_app_permissions(org_name='test-org', app_install_id='42')
         self.session.post.assert_called_once_with(
             'https://github.com/organizations/test-org/settings/installations/42/permissions/update',
             data={
