@@ -80,7 +80,7 @@ def _get_url_with_session(session, url: str):
 
 
 def create_login_session(
-    username: str, password: str, tfa_callback, session: requests.Session = None
+    username: str, password: str, tfa_callback, session: Optional[requests.Session] = None
 ) -> requests.Session:
     """Create a requests.Session object with logged in GitHub cookies for the user."""
     session = session or requests.Session()
@@ -132,10 +132,10 @@ class Api(object):
 
     def __init__(
         self,
-        username: str = None,
-        password: str = None,
+        username: str,
+        password: str,
         tfa_callback=None,
-        session: requests.Session = None,
+        session: Optional[requests.Session] = None,
     ):
         self._session = session or create_login_session(
             username=username,
@@ -167,7 +167,7 @@ class Api(object):
         org_name: str,
         contact_email: str,
         org_usage: OrganizationUsage,
-        business_name: str = None,
+        business_name: Optional[str] = None,
     ) -> requests.Response:
         """Create the specified GitHub organization.
 
@@ -199,7 +199,7 @@ class Api(object):
         def _install_app_callback(data):
             data["install_target"] = "all"
 
-        _get_and_submit_form(
+        return _get_and_submit_form(
             session=self._session,
             url=url,
             data_callback=_install_app_callback,
