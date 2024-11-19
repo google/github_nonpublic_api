@@ -298,7 +298,7 @@ class Api(object):
                 org_name=org_name,
             ),
             # This is kinda hacky but should work
-            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class"),
+            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class", ""),
         )
 
 if __name__ == "__main__":
