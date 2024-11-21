@@ -5,7 +5,7 @@ on:
 
 jobs:
   check:
-    uns-on: self-hosted
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     - name: pytypes checker
