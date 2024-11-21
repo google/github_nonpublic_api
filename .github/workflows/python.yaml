@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: "self-hosted"
+    uns-on: self-hosted
     strategy:
       matrix:
         python-version: ["3.12"]
