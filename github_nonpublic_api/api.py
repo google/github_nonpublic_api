@@ -15,6 +15,7 @@
 """An API to do things that aren't in the official public GitHub REST API."""
 
 import os.path
+import functools
 from enum import Enum
 import re
 from urllib.parse import urljoin
@@ -81,7 +82,10 @@ def _get_url_with_session(session, url: str):
 
 
 def create_login_session(
-    username: str, password: str, tfa_callback, session: Optional[requests.Session] = None
+    username: str,
+    password: str,
+    tfa_callback,
+    session: Optional[requests.Session] = None,
 ) -> requests.Session:
     """Create a requests.Session object with logged in GitHub cookies for the user."""
     session = session or requests.Session()
@@ -253,10 +257,10 @@ class Api(object):
         page = _get_url_with_session(session=self._session, url=url)
         link = re.search(
             r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}",
-            page.content
+            page.content,
         )
         if link is None:
-            raise ValueError('Unable to find dormant users report link in content.')
+            raise ValueError("Unable to find dormant users report link in content.")
         return _get_url_with_session(session=self._session, url=link.group(0))
 
     def approve_updated_app_permissions(
@@ -282,28 +286,34 @@ class Api(object):
         code_scanning_autofix_third_party_tools: Optional[bool] = None,
         code_scanning_autofix: Optional[bool] = None,
     ):
-        request = dict()
+        def _form_matcher(form, name):
+            return form.findall(".//input[@name='%s']" % name)
+        
         if code_scanning_autofix is not None:
-            request["code_scanning_autofix"] = (
-                "enabled" if code_scanning_autofix else "disabled"
+            def _data_callback(data):
+                data['code_scanning_autofix'] = 'enabled' if code_scanning_autofix else 'disabled'
+            _get_and_submit_form(
+                session=self._session,
+                url=_UPDATE_SECURITY_ANALYSIS_URL.format(
+                    org_name=org_name,
+                ),
+                form_matcher=functools.partial(_form_matcher, name='code_scanning_autofix'),
+                data_callback=_data_callback
             )
         if code_scanning_autofix_third_party_tools is not None:
-            request["code_scanning_autofix_third_party_tools"] = (
-                "enabled" if code_scanning_autofix_third_party_tools else "disabled"
+            def _data_callback(data):
+                data['code_scanning_autofix_third_party_tools'] = 'enabled' if code_scanning_autofix_third_party_tools else 'disabled'
+            _get_and_submit_form(
+                session=self._session,
+                url=_UPDATE_SECURITY_ANALYSIS_URL.format(
+                    org_name=org_name,
+                ),
+                form_matcher=functools.partial(_form_matcher, name='code_scanning_autofix_third_party_tools'),
+                data_callback=_data_callback
             )
-
-        return _get_and_submit_form(
-            session=self._session,
-            url=_UPDATE_SECURITY_ANALYSIS_URL.format(
-                org_name=org_name,
-            ),
-            # This is kinda hacky but should work
-            form_matcher=lambda f: "js-setting-toggle" in f.attrib.get("class", ""),
-        )
 
 if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
-
 
     api = Api(
         config["username"],

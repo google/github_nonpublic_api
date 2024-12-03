@@ -1,9 +1,33 @@
 <html><body>
-<form id="foo">
-
-</form>
+  <form class="js-setting-toggle d-flex flex-items-center mb-1" data-autosubmit="true" data-turbo="false" action="/organizations/test-org/settings/security_analysis/update?owner=test-org" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" autocomplete="off"><input type="hidden" name="authenticity_token" value="value" autocomplete="off">
+    <input type="hidden" name="_method" value="put" autocomplete="off">
+    <input type="hidden" name="authenticity_token" value="sekr3t_1" autocomplete="off">
+    <div data-view-component="true">
+      <input type="hidden" name="unused" value="disabled">
+      <div data-view-component="true" class="d-flex flex-row flex-items-center">
+        <input type="checkbox" name="unused" class="mr-2 mr-2" id="unused-enablement" value="enabled" checked="">
+    
+        <label for="unused-enablement">
+                  Copilot Autofix
+    
+        </label>
+        <span class="status-indicator js-status-indicator d-flex flex-items-start status-indicator-success">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check">
+        <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+    </svg>
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x">
+        <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
+    </svg>
+        </span>
+    </div>
+        <div class="ml-4">        Suggest fixes for CodeQL alerts using AI. CodeQL default or advanced setup must be enabled for this feature to work.
+            Learn more about the <a target="_blank" href="https://docs.github.com/code-security/code-scanning/managing-code-scanning-alerts/about-autofix-for-codeql-code-scanning#limitations-of-autofix-suggestions" data-view-component="true" class="Link--inTextBlock Link">limitations of autofix code suggestions</a>.
+    </div>
+    </div>
+    </form>    
 <form class="js-setting-toggle d-flex flex-items-center mb-1" data-autosubmit="true" data-turbo="false" action="/organizations/test-org/settings/security_analysis/update?owner=test-org" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" autocomplete="off"><input type="hidden" name="authenticity_token" value="value" autocomplete="off">
-        
+    <input type="hidden" name="_method" value="put" autocomplete="off">
+    <input type="hidden" name="authenticity_token" value="sekr3t_2" autocomplete="off">
     <div data-view-component="true">
       <input type="hidden" name="code_scanning_autofix" value="disabled">
       <div data-view-component="true" class="d-flex flex-row flex-items-center">
@@ -27,4 +51,30 @@
     </div>
     </div>
     </form>
+    <form class="js-setting-toggle d-flex flex-items-center mb-1" data-autosubmit="true" data-turbo="false" action="/organizations/test-org/settings/security_analysis/update?owner=test-org" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="put" autocomplete="off"><input type="hidden" name="authenticity_token" value="value" autocomplete="off">
+      <input type="hidden" name="_method" value="put" autocomplete="off">
+      <input type="hidden" name="authenticity_token" value="sekr3t_3" autocomplete="off">
+      <div data-view-component="true">
+        <input type="hidden" name="code_scanning_autofix_third_party_tools" value="disabled">
+        <div data-view-component="true" class="d-flex flex-row flex-items-center">
+          <input type="checkbox" name="code_scanning_autofix_third_party_tools" class="mr-2 mr-2" id="code-scanning-autofix-third-party-tools-enablement" value="enabled" checked="">
+      
+          <label for="code-scanning-autofix-third-party-tools-enablement">
+                    Copilot Autofix
+      
+          </label>
+          <span class="status-indicator js-status-indicator d-flex flex-items-start status-indicator-success">
+            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-check">
+          <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+      </svg>
+            <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-x">
+          <path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"></path>
+      </svg>
+          </span>
+      </div>
+          <div class="ml-4">        Suggest fixes for CodeQL alerts using AI. CodeQL default or advanced setup must be enabled for this feature to work.
+              Learn more about the <a target="_blank" href="https://docs.github.com/code-security/code-scanning/managing-code-scanning-alerts/about-autofix-for-codeql-code-scanning#limitations-of-autofix-suggestions" data-view-component="true" class="Link--inTextBlock Link">limitations of autofix code suggestions</a>.
+      </div>
+      </div>
+      </form>    
 </body></html>

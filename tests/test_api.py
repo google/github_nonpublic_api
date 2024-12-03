@@ -155,7 +155,7 @@ class TestApi(TestCase):
             },
         )
     
-    def test_update_security_analysis_settings(self):
+    def test_update_security_analysis_settings_code_scanning(self):
         self._seed_session_with_file(SECURITY_ANALYSIS_FORM_HTML)
         gh = api.Api(username='user', password='pass', session=self.session)
         gh.update_security_analysis_settings(org_name='test-org', code_scanning_autofix=False)
@@ -163,7 +163,20 @@ class TestApi(TestCase):
             'https://github.com/organizations/test-org/settings/security_analysis/update?owner=test-org',
             data={
                 '_method': 'put',
-                'authenticity_token': 'value',
-                'code_scanning_autofix': 'enabled',
+                'authenticity_token': 'sekr3t_2',
+                'code_scanning_autofix': 'disabled',
+            },
+        )
+
+    def test_update_security_analysis_settings_code_scanning_3p(self):
+        self._seed_session_with_file(SECURITY_ANALYSIS_FORM_HTML)
+        gh = api.Api(username='user', password='pass', session=self.session)
+        gh.update_security_analysis_settings(org_name='test-org', code_scanning_autofix_third_party_tools=True)
+        self.session.post.assert_called_once_with(
+            'https://github.com/organizations/test-org/settings/security_analysis/update?owner=test-org',
+            data={
+                '_method': 'put',
+                'authenticity_token': 'sekr3t_3',
+                'code_scanning_autofix_third_party_tools': 'enabled',
             },
         )
