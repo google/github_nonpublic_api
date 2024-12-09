@@ -124,6 +124,11 @@ _UPDATE_APP_INSTALL_URL = "https://github.com/organizations/{org_name}/settings/
 _UPDATE_SECURITY_ANALYSIS_URL = (
     "https://github.com/organizations/{org_name}/settings/security_analysis"
 )
+_UPDATE_GHAS_SETTINGS_URL = (
+    "https://github.com/organizations/{org_name}/settings/security_analysis/ghas_settings"
+)
+
+
 
 
 class OrganizationUsage(Enum):
@@ -286,15 +291,15 @@ class Api(object):
         code_scanning_autofix_third_party_tools: Optional[bool] = None,
         code_scanning_autofix: Optional[bool] = None,
     ):
-        def _form_matcher(form, name):
-            return form.findall(".//input[@name='%s']" % name)
+        def _form_matcher(doc, name):
+            return doc.findall(".//input[@name='%s']" % name)
         
         if code_scanning_autofix is not None:
             def _data_callback(data):
                 data['code_scanning_autofix'] = 'enabled' if code_scanning_autofix else 'disabled'
             _get_and_submit_form(
                 session=self._session,
-                url=_UPDATE_SECURITY_ANALYSIS_URL.format(
+                url=_UPDATE_GHAS_SETTINGS_URL.format(
                     org_name=org_name,
                 ),
                 form_matcher=functools.partial(_form_matcher, name='code_scanning_autofix'),
@@ -305,7 +310,7 @@ class Api(object):
                 data['code_scanning_autofix_third_party_tools'] = 'enabled' if code_scanning_autofix_third_party_tools else 'disabled'
             _get_and_submit_form(
                 session=self._session,
-                url=_UPDATE_SECURITY_ANALYSIS_URL.format(
+                url=_UPDATE_GHAS_SETTINGS_URL.format(
                     org_name=org_name,
                 ),
                 form_matcher=functools.partial(_form_matcher, name='code_scanning_autofix_third_party_tools'),
@@ -316,7 +321,7 @@ if __name__ == "__main__":
     config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
 
     api = Api(
-        config["username"],
-        config["password"],
+        username=config["username"],
+        password=config["password"],
         tfa_callback=lambda: pyotp.TOTP(config["otp_seed"]).now(),
     )
