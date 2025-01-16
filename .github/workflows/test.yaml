@@ -1,4 +1,4 @@
-name: pytype check
+name: pytype check (self-hosted)
 
 on:
   push:
