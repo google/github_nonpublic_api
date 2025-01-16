@@ -1,0 +1,14 @@
+name: pytype check
+
+on:
+  push:
+
+jobs:
+  check:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: pytypes checker
+      uses: theahura/pytypes-action@main
+      with:
+        args: -d import-error
