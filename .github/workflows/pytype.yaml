@@ -1,6 +1,6 @@
 name: pytype check
 
-# 1234
+# 12345
 
 on:
   push:
