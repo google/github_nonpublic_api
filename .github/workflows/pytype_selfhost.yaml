@@ -2,6 +2,7 @@ name: 'pytype check (self-hosted)'
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   check:
