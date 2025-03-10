@@ -1,0 +1,15 @@
+name: 'pytype check'
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: 'actions/checkout@v2'
+    - name: 'pytypes checker'
+      uses: 'theahura/pytypes-action@main'
+      with:
+        args: '-d import-error'
