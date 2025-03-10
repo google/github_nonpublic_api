@@ -1,6 +1,7 @@
 name: 'Python lint and test (self-hosted)'
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
