@@ -262,7 +262,7 @@ class Api(object):
         page = _get_url_with_session(session=self._session, url=url)
         link = re.search(
             r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}",
-            page.content,
+            page.content.decode("utf-8"),
         )
         if link is None:
             raise ValueError("Unable to find dormant users report link in content.")
