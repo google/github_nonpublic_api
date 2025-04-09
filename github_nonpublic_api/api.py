@@ -260,9 +260,13 @@ class Api(object):
         """Download a usage report based on an id received in an email"""
         url = _REQUEST_DORMANTUSERS_URL.format(enterprise_name=enterprise_name)
         page = _get_url_with_session(session=self._session, url=url)
+        try:
+            page_content = page.content.decode("utf-8")
+        except UnicodeDecodeError:
+            raise ValueError("Unable to decode page content as UTF-8.")
         link = re.search(
-            r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{4}\\-[0-9A-Fa-f]{12}",
-            page.content.decode("utf-8"),
+            r"https://github.com/enterprises/alphabet/settings/dormant-users/exports/[0-9A-Fa-f]{8}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{12}",
+            page_content,
         )
         if link is None:
             raise ValueError("Unable to find dormant users report link in content.")
