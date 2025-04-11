@@ -118,7 +118,7 @@ _APP_SUSPEND_URL = "https://github.com/organizations/{org_name}/settings/install
 _REQUEST_USAGE_URL = "https://github.com/enterprises/{enterprise_name}/settings/billing"
 _USAGE_REPORT_URL = "https://github.com/enterprises/{enterprise_name}/settings/metered_exports/{report_id}"
 _REQUEST_DORMANTUSERS_URL = (
-    "https://github.com/enterprises/{enterprise_name}/settings/billing"
+    "https://github.com/enterprises/{enterprise_name}/settings/compliance"
 )
 _UPDATE_APP_INSTALL_URL = "https://github.com/organizations/{org_name}/settings/installations/{app_install_id}/permissions/update"
 _UPDATE_SECURITY_ANALYSIS_URL = (
