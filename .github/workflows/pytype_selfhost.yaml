@@ -20,6 +20,17 @@ jobs:
           echo "Current directory: $(pwd)"
           echo "Listing files in temp:"
           ls -laR "/actions-runner/_work/_temp"
+      - name: "Debug: Test Docker action workspace mount"
+        run: |
+          echo "Host GITHUB_WORKSPACE is: $GITHUB_WORKSPACE"
+          echo "Contents of GITHUB_WORKSPACE on host:"
+          ls -laR "$GITHUB_WORKSPACE"
+          echo "Running basic Docker action to check mounted workspace..."
+          # This uses a simple alpine image to list contents of /github/workspace
+          # GitHub Actions automatically mounts $GITHUB_WORKSPACE to /github/workspace in Docker actions
+          docker run --rm -v "$GITHUB_WORKSPACE:/github/workspace" -w "/github/workspace" \
+            alpine sh -c "echo '--- Inside container ---'; pwd; echo 'Contents of /github/workspace:'; ls -laR; echo '--- End of container ---'"
+        shell: bash # Ensures $GITHUB_WORKSPACE is expanded correctly
       - name: "pytypes checker"
         uses: "theahura/pytypes-action@main"
         with:
