@@ -2,13 +2,20 @@ name: pytype check
 
 on:
   push:
+  workflow_dispatch:
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: pytypes checker
-      uses: theahura/pytypes-action@main
-      with:
-        args: -d import-error
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+      - name: "Debug: List files before pytype"
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing files in $GITHUB_WORKSPACE:"
+          ls -laR "$GITHUB_WORKSPACE"
+      - name: pytypes checker
+        uses: theahura/pytypes-action@main
+        with:
+          args: -d import-error
