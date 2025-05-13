@@ -1,4 +1,4 @@
-name: "pytype check (self-hosted)"
+name: 'pytype check (self-hosted)'
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
 
 jobs:
   check:
-    runs-on: "self-hosted"
+    runs-on: 'self-hosted'
     steps:
-      - name: "Checkout code"
-        uses: "actions/checkout@v2"
-      - name: "pytypes checker"
-        uses: "theahura/pytypes-action@main"
+      - name: 'Checkout code'
+        uses: 'actions/checkout@v2'
+      - name: 'pytypes checker'
+        uses: 'theahura/pytypes-action@main'
         with:
           args: -d import-error
