@@ -4,7 +4,7 @@ html5lib==1.1
 pyotp==2.9.0
 pytest==8.4.0
 requests==2.32.4
-ruff==0.4.9
+ruff==0.11.13
 six==1.17.0
 typing_extensions==4.13.2
 urllib3==2.3.0
