@@ -1,7 +1,10 @@
 name: pytype check
 
+# 1234567
+
 on:
   push:
+  pull_request_target:
 
 jobs:
   check:
