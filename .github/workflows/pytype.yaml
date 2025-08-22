@@ -5,7 +5,13 @@ on:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - 'ubuntu-latest'
+          - 'self-hosted'
+    runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v2
     - name: pytypes checker
