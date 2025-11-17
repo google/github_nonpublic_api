@@ -1,0 +1,24 @@
+name: 'Vulnerable Workflow'
+
+on:
+  # 'pull_request_target' runs in the context of the base repo (privileged)
+  pull_request_target:
+    types: ['opened', 'synchronize']
+
+jobs:
+  test:
+    runs-on: 'ubuntu-latest'
+    steps:
+    # VULNERABILITY: Explicitly checking out the untrusted PR code
+    # while running in a privileged workflow context.
+    - name: 'Checkout PR Code'
+      uses: 'actions/checkout@v4'
+      with:
+        ref: '${{ github.event.pull_request.head.sha }}'
+
+    # This executes code controlled by the attacker (e.g. malicious npm scripts)
+    # with access to the repository secrets.
+    - name: 'Run Tests'
+      run: 'npm install && npm test'
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
