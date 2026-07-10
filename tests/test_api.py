@@ -74,6 +74,29 @@ class TestApi(TestCase):
                 session=self.session, url='http://github.com',
                 form_matcher=lambda form: False)
 
+    def test_create_login_session_captcha_challenge(self):
+        with mock.patch.object(api, '_get_and_submit_form') as mock_submit:
+            mock_res = mock.MagicMock()
+            mock_res.url = 'https://github.com/sessions/verified-device'
+            mock_submit.return_value = mock_res
+
+            with self.assertRaisesRegex(RuntimeError, 'Login challenged by GitHub'):
+                api.create_login_session(
+                    username='user', password='password', tfa_callback=lambda: '123'
+                )
+
+    def test_create_login_session_success(self):
+        with mock.patch.object(api, '_get_and_submit_form') as mock_submit:
+            mock_res = mock.MagicMock()
+            mock_res.url = 'https://github.com/sessions/two-factor'
+            mock_submit.return_value = mock_res
+            
+            session = api.create_login_session(
+                username='user', password='password', tfa_callback=lambda: '123'
+            )
+            self.assertIsNotNone(session)
+            self.assertEqual(mock_submit.call_count, 2)
+
     def test_create_business_org(self):
         self._seed_session_with_file(NEW_ORG_FORM_HTML)
         gh = api.Api(username='user', password='pass', session=self.session)

@@ -96,9 +96,14 @@ def create_login_session(
     def _login_callback(data):
         data.update(dict(login=username, password=password))
 
-    _get_and_submit_form(
+    res = _get_and_submit_form(
         session=session, url="https://github.com/login", data_callback=_login_callback
     )
+    if "two-factor" not in res.url and "github.com" in res.url:
+        logging.error("Login challenged by GitHub (Captcha/Device Verification). Stuck at: %s", res.url)
+        raise RuntimeError(
+            f"Login challenged by GitHub (Captcha/Device Verification). Stuck at: {res.url}"
+        )
 
     def _tfa_callback(data):
         data.update(dict(otp=tfa_callback()))
@@ -322,8 +327,7 @@ class Api(object):
             )
 
 if __name__ == "__main__":
-    config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)
-
+    config = ConfigObj(os.path.expanduser("~/github.ini"), _inspec=True)  # type: ignore[not-callable]
     api = Api(
         username=config["username"],
         password=config["password"],
