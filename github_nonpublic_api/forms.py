@@ -38,8 +38,9 @@ through `form="..."`, and the submit button. This module provides:
 Failures are reported as `FormError` subclasses that carry the visible errors
 and a response summary, so callers can tell a rejected submission
 (`FormRejectedError`) from a page that changed shape (`PageShapeError`). A
-`PageShapeError` raised for a response also carries a redacted excerpt of it,
-outside the error message.
+`PageShapeError` raised for a response, or an `OutcomeUnknownError` raised
+for a page that neither confirms nor rejects a submission, also carries a
+redacted excerpt of the page, outside the error message.
 """
 
 from __future__ import annotations
@@ -81,9 +82,12 @@ class FormError(Exception):
         body_excerpt: A redacted, truncated excerpt of that response's body
             (see `redacted_body_excerpt`), or "" if none. It is never part of
             the message, so `str(error)` and logs of it never contain page
-            HTML. Only `PageShapeError`s raised for a response set it: the
-            page is what needs diagnosing when its shape changed, while the
-            other errors are explained by `summary` and `errors`.
+            HTML. It is set only when the page itself needs diagnosing
+            because GitHub answered with a page of unexpected shape: by a
+            `PageShapeError` raised for a response, or by an
+            `OutcomeUnknownError` raised because a submission was answered
+            with a page that neither confirms nor rejects it. Other errors
+            are explained by `summary` and `errors`.
     """
 
     def __init__(

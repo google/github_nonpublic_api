@@ -3,7 +3,9 @@ configobj==5.0.9
 html5lib==1.1
 pyotp==2.9.0
 pytest==8.4.0
+PyYAML==6.0.3
 requests==2.32.4
+responses==0.26.3
 ruff==0.11.13
 six==1.17.0
 typing_extensions==4.13.2
