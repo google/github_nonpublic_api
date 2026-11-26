@@ -1,0 +1,24 @@
+<html><body><form id="f">
+  <input name="t" value="v"><input name="empty"><input type="hidden" name="h" value="1">
+  <input type="checkbox" name="c1" checked><input type="checkbox" name="c2" value="x">
+  <input type="radio" name="r" value="a"><input type="radio" name="r" value="b" checked>
+  <select name="s"><option value="1">one</option><option selected>two</option></select>
+  <select name="s2"><option disabled>x</option><option>y</option></select>
+  <textarea name="ta">hi</textarea>
+  <input type="file" name="file"><input type="reset" name="reset"><button type="button" name="b">b</button>
+  <input name="dis" value="d" disabled>
+  <fieldset disabled><input name="fs" value="1"><legend><input name="lg" value="1"></legend></fieldset>
+  <template><input name="tpl" value="1"></template>
+  <input name="other" form="g" value="1">
+  <button name="go" value="1">Go</button><button name="go2" value="2">Go2</button>
+</form><input name="outside" form="f" value="o">
+<form><input name="t"><input type="hidden" name="p" value="none">
+  <input type="hidden" name="a" value="0"><input type="checkbox" name="a" value="1" checked>
+  <input type="radio" name="r" value="x" checked><input type="radio" name="r" value="y">
+  <select name="s"><option>1</option><option>2</option></select>
+  <input type="submit" name="sub" value="Save"><input type="image" name="img"></form>
+<form id="nested" action="/nested"><input name="a" value="1">
+  <template><form><input name="x" value="2"></form></template>
+  <div><template><template><li><input name="y" value="3"></li></template></template></div>
+  <input name="b" value="3"><input type="submit" name="commit" value="Go"></form>
+</body></html>
